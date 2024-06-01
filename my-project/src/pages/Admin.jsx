@@ -9,13 +9,13 @@ import HeaderAdmin from "./HeaderAdmin";
   const [category, setCategory] = useState('');
   const [quant, setQuant] = useState('');
   const [showPopup, setShowPopup] = useState(false);
-
+ axios.defaults.withCredentials = true;
 
  
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios.post('http://localhost:3000/pd', { name, price, img, color,quant, category }, {
+    axios.post('https://over-lays-server.vercel.app/pd', { name, price, img, color,quant, category }, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
