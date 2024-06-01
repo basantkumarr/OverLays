@@ -9,11 +9,12 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-
+axios.defaults.withCredentials = true;
+ 
   const handlesubmit = (e) => {
     e.preventDefault();
 
-    axios.post(`http://localhost:3000/user`, { name, password, email }, {
+    axios.post(`https://over-lays-server.vercel.app/user`, { name, password, email }, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
