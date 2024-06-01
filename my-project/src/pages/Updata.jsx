@@ -12,9 +12,10 @@ const Updata = () => {
   const [color, setColor] = useState('');
   const [category, setCategory] = useState('');
   const [quant, setQuant] = useState('');
-
+axios.defaults.withCredentials = true;
+ 
   useEffect(() => {
-    axios.get(`http://localhost:3000/collection/${productid}`)
+    axios.get('https://over-lays-server.vercel.app/collection/${productid}')
       .then(response => {
         const { name, price, img, color, category, quant } = response.data;
         setName(name);
