@@ -13,12 +13,13 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors({
-origin:"https://overlays-xi.vercel.app",
-  optionsSuccessStatus: 200,  
-  methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+  origin: "https://overlays-xi.vercel.app",
+  optionsSuccessStatus: 200,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
   preflightContinue: false,
 }));
+
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
