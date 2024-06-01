@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const Cart = ({ cart }) => {
   const [quantities, setQuantities] = useState(cart.map(product => product.quantity));
-
+ 
   const handleQuantityChange = (index, newQuantity) => {
     const updatedQuantities = [...quantities];
     updatedQuantities[index] = newQuantity;
