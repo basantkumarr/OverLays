@@ -11,8 +11,10 @@ const ProductCard = ({ cart, setCart }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  const cartClick = (product) => {
+ axios.defaults.withCredentials = true;
+ 
+  
+   const cartClick = (product) => {
     const existingProduct = cart.find(item => item._id === product._id);
     if (existingProduct) {
       setCart(cart.map(item =>
@@ -31,7 +33,7 @@ const ProductCard = ({ cart, setCart }) => {
   const decrement = () => setCount(prevCount => Math.max(1, prevCount - 1));
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/collection/${productid}`)
+    axios.get('https://over-lays-server.vercel.app/collection/${productid}')
       .then(response => {
         setProduct(response.data);
         setLoading(false);
