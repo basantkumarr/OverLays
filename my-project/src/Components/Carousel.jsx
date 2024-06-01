@@ -6,7 +6,10 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const CustomPrevArrow = (props) => {
+   axios.defaults.withCredentials = true;
+ 
   const { className, style, onClick } = props;
+  
   return (
     <button
       className={`${className} slick-prev slick-arrow`}
@@ -35,7 +38,7 @@ const Carousel = ({ category }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/collection')
+    axios.get(https://over-lays-server.vercel.app/collection')
       .then(response => setProducts(response.data))
       .catch(err => console.log(err));
   }, []);
