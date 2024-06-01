@@ -6,10 +6,11 @@ import { Link } from 'react-router-dom';
 
 const Update = () => {
   const[products,setProducts]=useState([])
-
+axios.defaults.withCredentials = true;
+ 
 
   useEffect(()=>{
-    axios.get("http://localhost:3000/collection").then(products =>setProducts(products.data)).catch(err=>console.log(err))
+    axios.get('https://over-lays-server.vercel.app/collection').then(products =>setProducts(products.data)).catch(err=>console.log(err))
   },[])
 
 
