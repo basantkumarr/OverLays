@@ -7,8 +7,8 @@ const All = () => {
   const [products, setProducts] = useState([]);
   const [value, setValue] = useState(90); // Default value set to 90
   const [sortOrder, setSortOrder] = useState(''); // New state for sorting
-
-  const handleChange = (event) => {
+ axios.defaults.withCredentials = true;
+   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
@@ -17,7 +17,7 @@ const All = () => {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3000/collection")
+    axios.get("https://over-lays-server.vercel.app/collection")
       .then(products => setProducts(products.data))
       .catch(err => console.log(err));
   }, []);
