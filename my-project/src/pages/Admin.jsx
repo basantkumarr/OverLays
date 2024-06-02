@@ -46,8 +46,8 @@ import HeaderAdmin from "./HeaderAdmin";
   return (
     <div className="flex  row all  justify-center">
 
-  <div>  <HeaderAdmin></HeaderAdmin>
-</div>  
+ <div className='flex justify-center'> <HeadeAdmin></HeadeAdmin>
+</div>   
 <div className="mx-5 ">
 
         <div className="text-center text-slate-800  py-4 text-3xl font-semibold">
