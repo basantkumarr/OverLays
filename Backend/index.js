@@ -1,145 +1,119 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const ProductModel = require('./models/Product');
-const UserModel = require('./models/User');
+import React, { useEffect, useState } from 'react';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
-require('dotenv').config();
+const CustomPrevArrow = (props) => {
+  axios.defaults.withCredentials = true;
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(express.json());
-app.use(cors({
-  origin: "https://overlays-xi.vercel.app",
-  optionsSuccessStatus: 200,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  credentials: true,
-  preflightContinue: false,
-}));
-
-const connectWithRetry = () => {
-  mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB', error);
-    setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
-  });
+  const { className, style, onClick } = props;
+  return (
+    <button
+      className={`${className} slick-prev slick-arrow`}
+      style={{ ...style, display: "block", background: "Grey", paddingTop: "1px" }}
+      onClick={onClick}
+    >
+      &#8249;
+    </button>
+  );
 };
 
-connectWithRetry();
-
-// Middleware to log incoming requests
-app.use((req, res, next) => {
-  console.log(`Received ${req.method} request for ${req.url}`);
-  next();
-});
-
-// Error handling middleware
-const errorHandler = (err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'An unexpected error occurred' });
+const CustomNextArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <button
+      className={`${className} slick-next slick-arrow`}
+      style={{ ...style, display: "block", background: "grey", paddingTop: "1px" }}
+      onClick={onClick}
+    >
+      &#8250;
+    </button>
+  );
 };
 
-app.post('/pd', async (req, res, next) => {
-  try {
-    const product = new ProductModel(req.body);
-    await product.save();
-    res.status(201).json(product);
-  } catch (error) {
-    next(error);
-  }
-});
+const Carousel = ({ category }) => {
+  const [products, setProducts] = useState([]);
 
-app.post('/user', async (req, res, next) => {
-  try {
-    const user = new UserModel(req.body);
-    await user.save();
-    res.status(201).json(user);
-  } catch (error) {
-    next(error);
-  }
-});
+  useEffect(() => {
+    axios.get('https://over-lays-server.vercel.app/collection')
+      .then(response => setProducts(response.data))
+      .catch(err => console.log(err));
+  }, []);
 
-app.post('/login', async (req, res, next) => {
-  const { email, password } = req.body;
-  try {
-    const user = await UserModel.findOne({ email });
-    if (user) {
-      if (user.password === password) {
-        res.json("success");
-      } else {
-        res.status(400).json("Incorrect password");
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    prevArrow: <CustomPrevArrow />,
+    nextArrow: <CustomNextArrow />,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        }
       }
-    } else {
-      res.status(404).json("User not found");
-    }
-  } catch (error) {
-    next(error);
-  }
-});
+    ]
+  };
 
-app.get('/collection', async (req, res, next) => {
-  try {
-    const products = await ProductModel.find();
-    res.json(products);
-  } catch (error) {
-    next(error);
-  }
-});
+  return (
+    <div className="bg-white">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <Slider {...settings}>
+          {products.filter(product => product.category === category).map((product) => (
+            <Link
+              key={product._id}
+              to={{
+                pathname: `/product/${product._id}`,
+                state: { product }
+              }}
+            >
+              <div className="group relative px-2">
+                <div className="aspect-h-1 aspect-w-1 w-full rounded-md bg-gray-200 lg:aspect-none lg:h-80">
+                  <img
+                    src={product.img}
+                    alt={product.imageAlt}
+                    className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  />
+                </div>
+                <div className="mt-4 flex justify-between">
+                  <div>
+                    <h3 className="text-l font-semibold text-gray-900">
+                      <a href={product.href}>
+                        <span aria-hidden="true" className="absolute inset-0" />
+                        {product.name}
+                      </a>
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-700">{product.color}</p>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">${product.price}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </Slider>
+      </div>
+    </div>
+  );
+};
 
-app.get('/collection/:id', async (req, res, next) => {
-  try {
-    const product = await ProductModel.findById(req.params.id);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).send('Product not found');
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.delete('/collection/:id', async (req, res, next) => {
-  try {
-    const product = await ProductModel.findByIdAndDelete(req.params.id);
-    if (product) {
-      res.json({ message: 'Product deleted successfully' });
-    } else {
-      res.status(404).send('Product not found');
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.put('/collection/:id', async (req, res, next) => {
-  try {
-    const updatedProduct = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (updatedProduct) {
-      res.json(updatedProduct);
-    } else {
-      res.status(404).send('Product not found');
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.get('/', (req, res) => {
-  res.send("Server is running...");
-});
-
-// Error handling middleware should be the last middleware
-app.use(errorHandler);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+export default Carousel;
