@@ -33,7 +33,11 @@ const ProductCard = ({ cart, setCart }) => {
   const decrement = () => setCount(prevCount => Math.max(1, prevCount - 1));
 
   useEffect(() => {
-    axios.get('https://over-lays-server.vercel.app/collection/${productid}')
+    axios.get('https://over-lays-server.vercel.app/collection/${productid}',{
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
       .then(response => {
         setProduct(response.data);
         setLoading(false);
