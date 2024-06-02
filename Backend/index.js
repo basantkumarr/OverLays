@@ -4,16 +4,19 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const ProductModel = require('./models/Product');
 const UserModel = require('./models/User');
-const customCors = require('./cors'); // Import custom CORS middleware
-
-
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(customCors); // Use custom CORS middleware
+app.use(cors({
+  origin: "https://overlays-xi.vercel.app",
+  optionsSuccessStatus: 200,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  credentials: true,
+  preflightContinue: false,
+}));
 
 const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI, {
@@ -36,12 +39,6 @@ app.use((req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);
   next();
 });
-
-// Error handling middleware
-const errorHandler = (err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'An unexpected error occurred' });
-};
 
 // Routes
 app.post('/pd', async (req, res, next) => {
@@ -135,7 +132,10 @@ app.get('/', (req, res) => {
 });
 
 // Error handling middleware should be the last middleware
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'An unexpected error occurred' });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
