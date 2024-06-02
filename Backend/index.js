@@ -29,6 +29,12 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error('Error connecting to MongoDB', error);
 });
 
+// Middleware to log incoming requests
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
+});
+
 // Error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error(err);
