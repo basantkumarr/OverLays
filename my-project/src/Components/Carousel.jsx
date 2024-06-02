@@ -38,8 +38,11 @@ const Carousel = ({ category }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    axios.get('https://over-lays-server.vercel.app/collection')
-      .then(response => setProducts(response.data))
+    axios.get('https://over-lays-server.vercel.app/collection',{
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    }).then(response => setProducts(response.data))
       .catch(err => console.log(err));
   }, []);
 
