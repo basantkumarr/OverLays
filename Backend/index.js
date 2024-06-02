@@ -29,19 +29,33 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error('Error connecting to MongoDB', error);
 });
 
-app.post('/pd', (req, res) => {
-  ProductModel.create(req.body)
-    .then(product => res.json(product))
-    .catch(err => res.status(400).json(err));
+// Error handling middleware
+const errorHandler = (err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'An unexpected error occurred' });
+};
+
+app.post('/pd', async (req, res, next) => {
+  try {
+    const product = new ProductModel(req.body);
+    await product.save();
+    res.status(201).json(product);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.post('/user', (req, res) => {
-  UserModel.create(req.body)
-    .then(user => res.json(user))
-    .catch(err => res.status(400).json(err));
+app.post('/user', async (req, res, next) => {
+  try {
+    const user = new UserModel(req.body);
+    await user.save();
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await UserModel.findOne({ email });
@@ -55,70 +69,64 @@ app.post('/login', async (req, res) => {
       res.status(404).json("User not found");
     }
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({ error: "Failed to login" });
+    next(error);
   }
 });
 
-app.get('/collection', (req, res) => {
-  ProductModel.find()
-    .then(products => res.json(products))
-    .catch(err => res.status(400).json(err));
+app.get('/collection', async (req, res, next) => {
+  try {
+    const products = await ProductModel.find();
+    res.json(products);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.get('/collection/:id', (req, res) => {
-  const productId = req.params.id;
-  ProductModel.findById(productId)
-    .then(product => {
-      if (product) {
-        res.json(product);
-      } else {
-        res.status(404).send('Product not found');
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Error finding product');
-    });
+app.get('/collection/:id', async (req, res, next) => {
+  try {
+    const product = await ProductModel.findById(req.params.id);
+    if (product) {
+      res.json(product);
+    } else {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.delete('/collection/:id', (req, res) => {
-  const productId = req.params.id;
-  ProductModel.findByIdAndDelete(productId)
-    .then(product => {
-      if (product) {
-        res.json({ message: 'Product deleted successfully' });
-      } else {
-        res.status(404).send('Product not found');
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Error deleting product');
-    });
+app.delete('/collection/:id', async (req, res, next) => {
+  try {
+    const product = await ProductModel.findByIdAndDelete(req.params.id);
+    if (product) {
+      res.json({ message: 'Product deleted successfully' });
+    } else {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.put('/collection/:id', (req, res) => {
-  const productId = req.params.id;
-  const updatedProduct = req.body; // Assuming you send the updated product data in the request body
-
-  ProductModel.findByIdAndUpdate(productId, updatedProduct, { new: true })
-    .then(updatedProduct => {
-      if (updatedProduct) {
-        res.json(updatedProduct);
-      } else {
-        res.status(404).send('Product not found');
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Error updating product');
-    });
+app.put('/collection/:id', async (req, res, next) => {
+  try {
+    const updatedProduct = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (updatedProduct) {
+      res.json(updatedProduct);
+    } else {
+      res.status(404).send('Product not found');
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.get('/', (req, res) => {
   res.send("Server is running...");
 });
+
+// Error handling middleware should be the last middleware
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
