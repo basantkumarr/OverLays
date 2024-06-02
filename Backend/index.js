@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 
 const connectWithRetry = () => {
-  mongoose.connect(process.env.MONGODB_URI, {
+  mongoose.connect('mongodb+srv://basantkumarweb:otgbOiKdi1I7B6L3@products.brtephm.mongodb.net/?retryWrites=true&w=majority&appName=Products', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
