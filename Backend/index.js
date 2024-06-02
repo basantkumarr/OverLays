@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const ProductModel = require('./models/Product');
 const UserModel = require('./models/User');
+const customCors = require('./cors'); // Import custom CORS middleware
+
 
 require('dotenv').config();
 
@@ -11,13 +13,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors({
-  origin: "https://overlays-xi.vercel.app",
-  optionsSuccessStatus: 200,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  credentials: true,
-  preflightContinue: false,
-}));
+app.use(customCors); // Use custom CORS middleware
 
 const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI, {
