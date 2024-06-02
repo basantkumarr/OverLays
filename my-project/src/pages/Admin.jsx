@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import HeaderAdmin from "./HeaderAdmin";
+
+
  const Admin = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -46,7 +48,7 @@ import HeaderAdmin from "./HeaderAdmin";
   return (
     <div className="flex  row all  justify-center">
 
- <div className='flex justify-center'> <HeadeAdmin></HeadeAdmin>
+ <div className='flex justify-center'> <HeaderAdmin></HeaderAdmin>
 </div>   
 <div className="mx-5 ">
 
