@@ -19,7 +19,7 @@ const Cart = ({ cart }) => {
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
-        <div className="flex">
+        <div className="flex flex-col  xs:flex-row">
           <div className="flex-1">
             {cart.map((product, index) => (
               <div key={index} className="flex justify-between items-center py-2 border-b">
