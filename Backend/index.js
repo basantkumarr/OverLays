@@ -18,16 +18,21 @@ app.use(cors({
   preflightContinue: false,
 }));
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Connected to MongoDB');
-})
-.catch((error) => {
-  console.error('Error connecting to MongoDB', error);
-});
+const connectWithRetry = () => {
+  mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB', error);
+    setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
+  });
+};
+
+connectWithRetry();
 
 // Middleware to log incoming requests
 app.use((req, res, next) => {
