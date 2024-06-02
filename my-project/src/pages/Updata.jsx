@@ -15,7 +15,7 @@ const Updata = () => {
 axios.defaults.withCredentials = true;
  
   useEffect(() => {
-    axios.get('https://over-lays-server.vercel.app/collection/${productid}')
+    axios.get(`https://over-lays-server.vercel.app/collection/${productid}`)
       .then(response => {
         const { name, price, img, color, category, quant } = response.data;
         setName(name);
