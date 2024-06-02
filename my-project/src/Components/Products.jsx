@@ -40,7 +40,7 @@ const Products = ({ category }) => {
       </div>
 
       <div className='flex flex-row'>
-        <div className='w-3/12 border-r pl-2 filter pr-3'>
+        <div className='w-3/12 border-r pr-2 filter pr-3'>
           <h1 className='text-4xl font-semibold underline mb-4'>Filters</h1>
           
           <div className='pricefilter'>
