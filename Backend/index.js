@@ -10,13 +10,27 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors({
+ app.use(cors({
   origin: "https://overlays-xi.vercel.app",
   optionsSuccessStatus: 200,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
   preflightContinue: false,
 }));
+
+// CORS Middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://overlays-xi.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+  } else {
+    next();
+  }
+});
+
 
 const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI, {
