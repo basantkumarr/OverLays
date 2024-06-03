@@ -41,7 +41,7 @@ const All = () => {
         </div>
 
         <div className='flex'>
-          <div className='w-3/12 border-r filter pr-4'>
+          <div className='w-3/12 border-r pr-2 filter pr-3'>
             <h1 className='text-4xl font-semibold mb-4'>Filters</h1>
             {/* Add filter options here */}
             <div className='pricefilter'>
