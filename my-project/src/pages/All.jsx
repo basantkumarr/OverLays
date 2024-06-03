@@ -40,57 +40,57 @@ const All = () => {
           All Varieties
         </div>
 
-        <div className='flex'>
-          <div className='w-3/12 border-r pr-2 filter pr-3'>
-            <h1 className='text-4xl font-semibold mb-4'>Filters</h1>
-            {/* Add filter options here */}
-            <div className='pricefilter'>
-              <h2 className='text-2xl font-semibold mb-4'>Price</h2>
-              <div className="container py-1">
-                <div className="flex flex-col items-center">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={value}
-                    onChange={handleChange}
-                    className="slider"
-                    style={{ width: '100%', background: 'black', accentColor: 'black' }}
-                  />
-                  <div className="mt-2 text-lg">
-                    Less than : {value}
-                  </div>
+       <div className='flex flex-row'>
+        <div className='w-3/12 border-r pr-2 filter pr-3'>
+          <h1 className='text-3xl font-semibold underline mb-4'>Filters</h1>
+          
+          <div className='pricefilter'>
+            <h2 className='text-2xl font-semibold mb-4'>Price</h2>
+            <div className="container py-1">
+              <div className="flex flex-col items-center">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={value}
+                  onChange={handleChange}
+                  className="slider"
+                  style={{ width: '100%', background: 'black', accentColor: 'black' }}
+                />
+                <div className="mt-2 text-lg">
+                  Less than : {value}
                 </div>
               </div>
             </div>
-            <br />
-
-            <div className='pricefilter'>
-              <h2 className='text-2xl font-semibold mb-4'>
-                Low to High
-                <input
-                  className="form-check-input ml-2"
-                  type="radio"
-                  name="sortOrder"
-                  value="lowToHigh"
-                  onChange={handleSortChange}
-                />
-              </h2>
-            </div>
-
-            <div className='pricefilter'>
-              <h2 className='text-2xl font-semibold mb-4'>
-                High to Low
-                <input
-                  className="form-check-input ml-2"
-                  type="radio"
-                  name="sortOrder"
-                  value="highToLow"
-                  onChange={handleSortChange}
-                />
-              </h2>
-            </div>
           </div>
+          <br />
+
+          <div className='pricefilter'>
+            <h2 className='text-2xl font-semibold mb-4'>
+              Low to High
+              <input
+                className="form-check-input ml-2"
+                type="radio"
+                name="sortOrder"
+                value="lowToHigh"
+                onChange={handleSortChange}
+              />
+            </h2>
+          </div>
+
+          <div className='pricefilter'>
+            <h2 className='text-2xl font-semibold mb-4'>
+              High to Low
+              <input
+                className="form-check-input ml-2"
+                type="radio"
+                name="sortOrder"
+                value="highToLow"
+                onChange={handleSortChange}
+              />
+            </h2>
+          </div>
+        </div>
 
           <div className='w-9/12 pd pl-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
