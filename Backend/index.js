@@ -16,8 +16,8 @@ app.use(express.json());
   optionsSuccessStatus: 200,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-}));
+preflightContinue: false,
+ }));
 
 // CORS Middleware
 app.use((req, res, next) => {
