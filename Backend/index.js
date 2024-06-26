@@ -1,128 +1,75 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const InvoiceModel = require('./models/Invoice');
-const QuotationModel = require('./models/Quotation');
+const ProductModel = require('./models/Product');
 const UserModel = require('./models/User');
-const RegisterModel = require('./models/Register');
-
-dotenv.config();
-
+require('dotenv').config();
 const app = express();
+const port = process.env.PORT || 3000;
 app.use(express.json());
-
-const allowedOrigins = [
-  'https://invoicerly.vercel.app',
-  'https://invoicerly-basants-projects-54b8f0df.vercel.app'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // Allow non-origin requests like from Postman or curl
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+ app.use(cors({
+  origin: "https://overlays-xi.vercel.app",
+  optionsSuccessStatus: 200,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
-  preflightContinue: true,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Access-Control-Allow-Origin']
-}));
+preflightContinue: false,
+ }));
 
-// Middleware to handle preflight requests for all routes
-app.options('*', cors());
-
-const mongoURI = process.env.MONGO_URI;
-const port = process.env.PORT || 3001;
-
-mongoose.connect("mongodb+srv://basantkumarweb:gVLbGoBQUdMThPdn@data.hi1kuqj.mongodb.net/?retryWrites=true&w=majority&appName=Data", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('MongoDB connected...'))
-  .catch(err => console.log(err));
-
-// Define your routes
-app.post('/invoices', async (req, res, next) => {
+// CORS Middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://overlays-xi.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+  } else {
+    next();
+  }
+});
+const connectWithRetry = () => {
+  mongoose.connect('mongodb+srv://basantkumarweb:otgbOiKdi1I7B6L3@products.brtephm.mongodb.net/?retryWrites=true&w=majority&appName=Products', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB', error);
+    setTimeout(connectWithRetry, 5000); // Retry after 5 seconds
+  });
+};
+connectWithRetry();
+// Middleware to log incoming requests
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}`);
+  next();
+});
+// Routes
+app.post('/pd', async (req, res, next) => {
   try {
-    const invoices = await InvoiceModel.create(req.body);
-    res.json(invoices);
-  } catch (err) {
-    next(err);
+    const product = new ProductModel(req.body);
+    await product.save();
+    res.status(201).json(product);
+  } catch (error) {
+    next(error);
   }
 });
-
-app.post('/quotation', (req, res) => {
-  QuotationModel.create(req.body)
-    .then(quotation => res.json(quotation))
-    .catch(err => res.json(err));
-});
-
-app.get('/quotation/:id', (req, res) => {
-  QuotationModel.findById(req.params.id)
-    .then(invoice => {
-      if (invoice) {
-        res.json(invoice);
-      } else {
-        res.status(404).json({ error: "Quotation not found" });
-      }
-    })
-    .catch(err => {
-      res.json(err);
-    });
-});
-
-app.post('/invdata', (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
-  }
-  InvoiceModel.find({ email: email })
-    .then(invoices => res.json(invoices))
-    .catch(err => res.status(400).json(err));
-});
-
-app.post('/quotdata', (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
-  }
-  QuotationModel.find({ email: email })
-    .then(invoices => res.json(invoices))
-    .catch(err => res.status(400).json(err));
-});
-
-app.get('/invoices/:id', async (req, res, next) => {
+app.post('/user', async (req, res, next) => {
   try {
-    const invoice = await InvoiceModel.findById(req.params.id);
-    if (invoice) {
-      res.json(invoice);
-    } else {
-      res.status(404).json({ error: "Invoice not found" });
-    }
-  } catch (err) {
-    next(err);
+    const user = new UserModel(req.body);
+    await user.save();
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
   }
 });
-
-app.post("/register", async (req, res, next) => {
-  try {
-    const register = await RegisterModel.create(req.body);
-    res.json(register);
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.post("/login", async (req, res, next) => {
+app.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const user = await RegisterModel.findOne({ email });
+    const user = await UserModel.findOne({ email });
     if (user) {
       if (user.password === password) {
         res.json("success");
@@ -136,51 +83,58 @@ app.post("/login", async (req, res, next) => {
     next(error);
   }
 });
-
-app.get('/users/:id', async (req, res, next) => {
+app.get('/collection', async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.params.id);
-    if (user) {
-      res.json(user);
+    const products = await ProductModel.find();
+    res.json(products);
+  } catch (error) {
+    next(error);
+  }
+});
+app.get('/collection/:id', async (req, res, next) => {
+  try {
+    const product = await ProductModel.findById(req.params.id);
+    if (product) {
+      res.json(product);
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).send('Product not found');
     }
   } catch (error) {
     next(error);
   }
 });
-
-app.put('/users/:id', async (req, res, next) => {
+app.delete('/collection/:id', async (req, res, next) => {
   try {
-    const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (user) {
-      res.json({ message: 'User updated successfully', user });
+    const product = await ProductModel.findByIdAndDelete(req.params.id);
+    if (product) {
+      res.json({ message: 'Product deleted successfully' });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).send('Product not found');
     }
   } catch (error) {
     next(error);
   }
 });
-
-app.post("/check", async (req, res, next) => {
+app.put('/collection/:id', async (req, res, next) => {
   try {
-    const user = await RegisterModel.findOne({ email: req.body.email });
-    if (user) {
-      res.json({ status: "success", data: user });
+    const updatedProduct = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (updatedProduct) {
+      res.json(updatedProduct);
     } else {
-      res.json({ status: "fail" });
+      res.status(404).send('Product not found');
     }
   } catch (error) {
     next(error);
   }
 });
-
+app.get('/', (req, res) => {
+  res.send("Server is running...");
+});
+// Error handling middleware should be the last middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!', details: err.message });
+  console.error(err);
+  res.status(500).json({ error: 'An unexpected error occurred' });
 });
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
